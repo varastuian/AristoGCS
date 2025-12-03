@@ -20,7 +20,7 @@ public:
 
     QUrl setupSource() const final;
     bool allowSetupWhileArmed() const final { return true; }
-
+    bool requiresPassword()  const final { return true; }
 private:
     const QString _name = tr("Motors");
 };

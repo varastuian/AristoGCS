@@ -1838,6 +1838,14 @@ void Vehicle::_parametersReady(bool parametersReady)
     // Send time twice, more likely to get to the vehicle on a noisy link
     _sendQGCTimeToVehicle();
     if (parametersReady) {
+        parameterManager()->getParameter(-1, "SR0_EXTRA1")->setRawValue(1);
+        parameterManager()->getParameter(-1, "SR0_EXTRA2")->setRawValue(1);
+        parameterManager()->getParameter(-1, "SR0_EXTRA3")->setRawValue(1);
+        parameterManager()->getParameter(-1, "SR0_EXT_STAT")->setRawValue(1);
+        parameterManager()->getParameter(-1, "SR0_PARAMS")->setRawValue(1);
+        parameterManager()->getParameter(-1, "SR0_POSITION")->setRawValue(2);
+
+
         disconnect(_parameterManager, &ParameterManager::parametersReadyChanged, this, &Vehicle::_parametersReady);
         _setupAutoDisarmSignalling();
         _initialConnectStateMachine->advance();

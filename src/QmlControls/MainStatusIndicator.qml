@@ -42,11 +42,11 @@ RowLayout {
         text:               mainStatusText()
         color:              qgcPal.windowTransparentText
         font.pointSize:     ScreenTools.largeFontPointSize
-
+        textFont : "Siegra"
         property string _commLostText:      qsTr("Comms Lost")
         property string _readyToFlyText:    control._vehicleFlies ? qsTr("Ready To Fly") : qsTr("Ready")
         property string _notReadyToFlyText: qsTr("Not Ready")
-        property string _disconnectedText:  qsTr("Disconnected - Click to manually connect")
+        property string _disconnectedText:  qsTr("Disconnected")
         property string _armedText:         qsTr("Armed")
         property string _flyingText:        qsTr("Flying")
         property string _landingText:       qsTr("Landing")
@@ -55,19 +55,19 @@ RowLayout {
             var statusText
             if (_activeVehicle) {
                 if (_communicationLost) {
-                    _mainStatusBGColor = "red"
+                    _mainStatusBGColor = "#ea7317"
                     return mainStatusLabel._commLostText
                 }
                 if (_activeVehicle.armed) {
-                    _mainStatusBGColor = "green"
+                    _mainStatusBGColor = "#73bfb8"
 
                     if (_healthAndArmingChecksSupported) {
                         if (_activeVehicle.healthAndArmingCheckReport.canArm) {
                             if (_activeVehicle.healthAndArmingCheckReport.hasWarningsOrErrors) {
-                                _mainStatusBGColor = "yellow"
+                                _mainStatusBGColor = "#fec601"
                             }
                         } else {
-                            _mainStatusBGColor = "red"
+                            _mainStatusBGColor = "#ea7317"
                         }
                     }
 
@@ -82,30 +82,30 @@ RowLayout {
                     if (_healthAndArmingChecksSupported) {
                         if (_activeVehicle.healthAndArmingCheckReport.canArm) {
                             if (_activeVehicle.healthAndArmingCheckReport.hasWarningsOrErrors) {
-                                _mainStatusBGColor = "yellow"
+                                _mainStatusBGColor = "#fec601"
                             } else {
-                                _mainStatusBGColor = "green"
+                                _mainStatusBGColor = "#73bfb8"
                             }
                             return mainStatusLabel._readyToFlyText
                         } else {
-                            _mainStatusBGColor = "red"
+                            _mainStatusBGColor = "#ea7317"
                             return mainStatusLabel._notReadyToFlyText
                         }
                     } else if (_activeVehicle.readyToFlyAvailable) {
                         if (_activeVehicle.readyToFly) {
-                            _mainStatusBGColor = "green"
+                            _mainStatusBGColor =  "#73bfb8"
                             return mainStatusLabel._readyToFlyText
                         } else {
-                            _mainStatusBGColor = "yellow"
+                            _mainStatusBGColor = "#fec601"
                             return mainStatusLabel._notReadyToFlyText
                         }
                     } else {
                         // Best we can do is determine readiness based on AutoPilot component setup and health indicators from SYS_STATUS
                         if (_activeVehicle.allSensorsHealthy && _activeVehicle.autopilotPlugin.setupComplete) {
-                            _mainStatusBGColor = "green"
+                            _mainStatusBGColor = "#73bfb8"
                             return mainStatusLabel._readyToFlyText
                         } else {
-                            _mainStatusBGColor = "yellow"
+                            _mainStatusBGColor = "#fec601"
                             return mainStatusLabel._notReadyToFlyText
                         }
                     }
@@ -126,7 +126,8 @@ RowLayout {
             color:                  getIconColor()
             sourceSize.width:       width
             fillMode:               Image.PreserveAspectFit
-            visible:                _activeVehicle && _activeVehicle.messageCount > 0
+            // visible:                _activeVehicle && _activeVehicle.messageCount > 0
+            visible:                false
 
             function getIconColor() {
                 let iconColor = qgcPal.windowTransparentText
@@ -143,7 +144,7 @@ RowLayout {
 
         QGCMouseArea {
             anchors.fill:   parent
-            onClicked:      dropMainStatusIndicator()
+            // onClicked:      dropMainStatusIndicator()
         }
     }
 

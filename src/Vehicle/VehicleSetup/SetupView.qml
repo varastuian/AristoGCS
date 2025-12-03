@@ -14,6 +14,7 @@ import QtQuick.Layouts
 import QGroundControl
 
 import QGroundControl.Controls
+import QGroundControl.AppSettings
 
 
 
@@ -40,6 +41,7 @@ Rectangle {
     property string _messagePanelText:              qsTr("missing message panel text")
     property bool   _fullParameterVehicleAvailable: QGroundControl.multiVehicleManager.parameterReadyVehicleAvailable && !QGroundControl.multiVehicleManager.activeVehicle.parameterManager.missingParameters
     property var    _corePlugin:                    QGroundControl.corePlugin
+    property var componentToLoad
 
     function showSummaryPanel() {
         if (mainWindow.allowViewSwitch()) {
@@ -179,6 +181,8 @@ Rectangle {
             }
         }
     }
+    SettingsPagesModel { id: settingsPagesModel }
+
 
     Component {
         id: messagePanelComponent
@@ -212,9 +216,42 @@ Rectangle {
             id:         buttonColumn
             spacing:    ScreenTools.defaultFontPixelHeight / 4
 
+            ColumnLayout {
+                id:                     versionColumnLayout
+                Layout.preferredWidth:  parent.width
+                spacing:                0
+                Layout.alignment:       Qt.AlignHCenter
+
+                QGCLabel {
+                    id:                     versionLabel
+                    text:                   qsTr("%1 Version").arg(QGroundControl.appName)
+                    font.pointSize:         ScreenTools.smallFontPointSize
+                    wrapMode:               QGCLabel.WordWrap
+                    Layout.maximumWidth:    parent.width
+                    Layout.alignment:       Qt.AlignHCenter
+                }
+
+                QGCLabel {
+                    text:                   QGroundControl.qgcVersion
+                    font.pointSize:         ScreenTools.smallFontPointSize
+                    wrapMode:               QGCLabel.WrapAnywhere
+                    Layout.maximumWidth:    parent.width
+                    Layout.alignment:       Qt.AlignHCenter
+                }
+
+                QGCLabel {
+                    text:                   QGroundControl.qgcAppDate
+                    font.pointSize:         ScreenTools.smallFontPointSize
+                    wrapMode:               QGCLabel.WrapAnywhere
+                    Layout.maximumWidth:    parent.width
+                    Layout.alignment:       Qt.AlignLeft
+                    visible:                QGroundControl.qgcDailyBuild
+                }
+            }
+
             ConfigButton {
                 id:                 summaryButton
-                icon.source:        "/qmlimages/VehicleSummaryIcon.png"
+                // icon.source:        "/qmlimages/VehicleSummaryIcon.png"
                 checked:            true
                 text:               qsTr("Summary")
                 Layout.fillWidth:   true
@@ -222,62 +259,113 @@ Rectangle {
                 onClicked: showSummaryPanel()
             }
 
-            ConfigButton {
-                visible:            QGroundControl.multiVehicleManager.activeVehicle ? QGroundControl.multiVehicleManager.activeVehicle.flowImageIndex > 0 : false
-                text:               qsTr("Optical Flow")
-                Layout.fillWidth:   true
-                onClicked:          showPanel(this, "qrc:/qml/QGroundControl/VehicleSetup/OpticalFlowSensor.qml");
+            Repeater {
+                id:     buttonRepeater
+                model:  settingsPagesModel
+
+                SettingsButton {
+                    Layout.fillWidth:   true
+                    text:               name
+                    // icon.source:        iconUrl
+                    visible:            pageVisible()
+
+                    property var componentUrl: modelData
+
+                    onClicked: {
+                        if (mainWindow.allowViewSwitch()) {
+                            if (requiresPassword()) {
+                                componentToLoad = url
+                                passwordPopupComponent.createObject(this, { title: qsTr("Enter Password") }).open()
+                            } else {
+                                // showVehicleComponentPanel(componentUrl)
+                                if (panelLoader.source !== url) {
+                                    panelLoader.source = url
+                                }
+
+                            }
+                            checked = true
+                        }
+                    }
+
+
+
+
+                }
             }
 
-            ConfigButton {
-                id:                 joystickButton
-                icon.source:      "/qmlimages/Joystick.png"
-                setupComplete:      _activeJoystick ? _activeJoystick.calibrated || _buttonsOnly : false
-                visible:            _fullParameterVehicleAvailable && joystickManager.joysticks.length !== 0
-                text:               _forcedToButtonsOnly ? qsTr("Buttons") : qsTr("Joystick")
-                Layout.fillWidth:   true
-                onClicked:          showPanel(this, "qrc:/qml/QGroundControl/VehicleSetup/JoystickConfig.qml")
+            // ConfigButton {
+            //     visible:            QGroundControl.multiVehicleManager.activeVehicle ? QGroundControl.multiVehicleManager.activeVehicle.flowImageIndex > 0 : false
+            //     text:               qsTr("Optical Flow")
+            //     Layout.fillWidth:   true
+            //     onClicked:          showPanel(this, "qrc:/qml/QGroundControl/VehicleSetup/OpticalFlowSensor.qml");
+            // }
 
-                property Joystick _activeJoystick: joystickManager.activeJoystick
-                property bool   _buttonsOnly:           _activeJoystick ? _activeJoystick.axisCount == 0 : false
-                property bool   _forcedToButtonsOnly:   !QGroundControl.corePlugin.options.allowJoystickSelection && _buttonsOnly
-            }
+            // ConfigButton {
+            //     id:                 joystickButton
+            //     icon.source:      "/qmlimages/Joystick.png"
+            //     setupComplete:      _activeJoystick ? _activeJoystick.calibrated || _buttonsOnly : false
+            //     visible:            _fullParameterVehicleAvailable && joystickManager.joysticks.length !== 0
+            //     text:               _forcedToButtonsOnly ? qsTr("Buttons") : qsTr("Joystick")
+            //     Layout.fillWidth:   true
+            //     onClicked:          showPanel(this, "qrc:/qml/QGroundControl/VehicleSetup/JoystickConfig.qml")
+
+            //     property Joystick _activeJoystick: joystickManager.activeJoystick
+            //     property bool   _buttonsOnly:           _activeJoystick ? _activeJoystick.axisCount == 0 : false
+            //     property bool   _forcedToButtonsOnly:   !QGroundControl.corePlugin.options.allowJoystickSelection && _buttonsOnly
+            // }
 
             Repeater {
                 id:     componentRepeater
                 model:  _fullParameterVehicleAvailable ? QGroundControl.multiVehicleManager.activeVehicle.autopilotPlugin.vehicleComponents : 0
+                // property var componentUrl: modelData
+
 
                 ConfigButton {
-                    icon.source:      modelData.iconResource
+                    // icon.source:      modelData.iconResource
                     setupComplete:      modelData.setupComplete
                     text:               modelData.name
                     visible:            modelData.setupSource.toString() !== ""
                     Layout.fillWidth:   true
-                    onClicked:          showVehicleComponentPanel(componentUrl)
-
                     property var componentUrl: modelData
+
+                    onClicked: {
+                        if (modelData.requiresPassword) {
+                            componentToLoad = componentUrl
+                            passwordPopupComponent.createObject(this, { title: qsTr("Enter Password") }).open()
+                        } else {
+                            showVehicleComponentPanel(componentUrl)
+                        }
+                    }
+                    // onClicked:          showVehicleComponentPanel(componentUrl)
+
                 }
             }
 
             ConfigButton {
                 id:                 parametersButton
+                // visible: false
                 visible:            QGroundControl.multiVehicleManager.parameterReadyVehicleAvailable &&
                                     !QGroundControl.multiVehicleManager.activeVehicle.usingHighLatencyLink &&
                                     _corePlugin.showAdvancedUI
                 text:               qsTr("Parameters")
                 Layout.fillWidth:   true
-                icon.source:        "/qmlimages/subMenuButtonImage.png"
-                onClicked:          showPanel(this, "qrc:/qml/QGroundControl/VehicleSetup/SetupParameterEditor.qml")
+                onClicked: {
+                    componentToLoad = "qrc:/qml/QGroundControl/VehicleSetup/SetupParameterEditor.qml"
+                    passwordPopupComponent.createObject(this, { title: qsTr("Enter Password") }).open()
+                }
             }
 
             ConfigButton {
                 id:                 firmwareButton
-                icon.source:      "/qmlimages/FirmwareUpgradeIcon.png"
+                // icon.source:      "/qmlimages/FirmwareUpgradeIcon.png"
                 visible:            !ScreenTools.isMobile && _corePlugin.options.showFirmwareUpgrade
                 text:               qsTr("Firmware")
                 Layout.fillWidth:   true
-
-                onClicked: showPanel(this, "qrc:/qml/QGroundControl/VehicleSetup/FirmwareUpgrade.qml")
+                onClicked: {
+                    componentToLoad = "qrc:/qml/QGroundControl/VehicleSetup/FirmwareUpgrade.qml"
+                    passwordPopupComponent.createObject(this, { title: qsTr("Enter Password") }).open()
+                }
+                // onClicked: showPanel(this, "qrc:/qml/QGroundControl/VehicleSetup/FirmwareUpgrade.qml")
             }
         }
     }
@@ -319,4 +407,79 @@ Rectangle {
 
         property var vehicleComponent
     }
+
+
+    Component {
+        id: passwordPopupComponent
+
+        QGCPopupDialog {
+            id: passwordPopup
+            title: "Enter Password"
+            modal: true
+            focus: true
+            buttons:    Dialog.Close
+
+            onOpened: {
+                passField.text = ""
+                passField.forceActiveFocus()
+            }
+
+            ColumnLayout {
+                spacing: ScreenTools.defaultFontPixelHeight
+
+                QGCLabel {
+                    text: "This setting is sensitive and requires a password."
+                    wrapMode: Text.WordWrap
+                }
+
+                QGCTextField {
+                    id: passField
+                    placeholderText: "Password"
+                    echoMode: TextInput.Password
+                    width: parent.width
+                    height: 30
+                }
+
+                // Row {
+                //     spacing: 10
+
+                    // QGCButton {
+                    //     text: "Cancel"
+                    //     onClicked: {
+                    //         componentToLoad = null
+                    //         passwordPopup.close()
+                    //     }
+                    // }
+
+                    QGCButton {
+                        text: "OK"
+                        onClicked: {
+                            // if (passField.text === _qgcAppSettings.sensitiveSettingsPassword) {
+                            if (passField.text === "qwerty") {
+                                passwordPopup.close()
+                                if (typeof componentToLoad === "string") {
+                                                showPanel(this, componentToLoad)
+                                                return
+                                }
+                                else{
+                                    showVehicleComponentPanel(componentToLoad)
+
+                                }
+
+                            } else {
+                                mainWindow.showMessageDialog(
+                                            "Incorrect password",
+                                            "The password you entered is incorrect."
+                                            )
+                            }
+                        }
+                    }
+                // }
+            }
+
+        }
+
+    }
+
+
 }

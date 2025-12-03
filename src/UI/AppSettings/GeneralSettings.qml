@@ -23,65 +23,84 @@ import QGroundControl.Controls
 
 SettingsPage {
     property var    _settingsManager:           QGroundControl.settingsManager
+    property var    _flyViewSettings:           _settingsManager.flyViewSettings
+
     property var    _appSettings:               _settingsManager.appSettings
     property var    _brandImageSettings:        _settingsManager.brandImageSettings
     property Fact   _appFontPointSize:          _appSettings.appFontPointSize
     property Fact   _userBrandImageIndoor:      _brandImageSettings.userBrandImageIndoor
     property Fact   _userBrandImageOutdoor:     _brandImageSettings.userBrandImageOutdoor
     property Fact   _appSavePath:               _appSettings.savePath
+    property var    _activeVehicle:         QGroundControl.multiVehicleManager.activeVehicle
+
 
     SettingsGroupLayout {
         Layout.fillWidth:   true
         heading:            qsTr("General")
 
-        LabelledFactComboBox {
-            label:      qsTr("Language")
-            fact:       _appSettings.qLocaleLanguage
-            indexModel: false
-            visible:    _appSettings.qLocaleLanguage.visible
-        }
+        // LabelledFactComboBox {
+        //     label:      qsTr("Language")
+        //     fact:       _appSettings.qLocaleLanguage
+        //     indexModel: false
+        //     visible:    _appSettings.qLocaleLanguage.visible
+        // }
 
-        LabelledFactComboBox {
-            label:      qsTr("Color Scheme")
-            fact:       _appSettings.indoorPalette
-            indexModel: false
-            visible:    _appSettings.indoorPalette.visible
-        }
+        // LabelledFactComboBox {
+        //     label:      qsTr("Color Scheme")
+        //     fact:       _appSettings.indoorPalette
+        //     indexModel: false
+        //     visible:    _appSettings.indoorPalette.visible
+        // }
 
-        LabelledFactComboBox {
-            label:       qsTr("Stream GCS Position")
-            fact:       _appSettings.followTarget
-            indexModel: false
-            visible:    _appSettings.followTarget.visible
-        }
+        // LabelledFactComboBox {
+        //     label:       qsTr("Stream GCS Position")
+        //     fact:       _appSettings.followTarget
+        //     indexModel: false
+        //     visible:    _appSettings.followTarget.visible
+        // }
 
+        // FactCheckBoxSlider {
+        //     Layout.fillWidth: true
+        //     text:           qsTr("Mute all audio output")
+        //     fact:       _audioMuted
+        //     visible:    _audioMuted.visible
+        //     property Fact _audioMuted: _appSettings.audioMuted
+        // }
         FactCheckBoxSlider {
-            Layout.fillWidth: true
-            text:           qsTr("Mute all audio output")
-            fact:       _audioMuted
-            visible:    _audioMuted.visible
-            property Fact _audioMuted: _appSettings.audioMuted
+            Layout.fillWidth:   true
+            text:               qsTr("Show Telemetry Log Replay Status Bar")
+            fact:               _showLogReplayStatusBar
+            visible:            _showLogReplayStatusBar.visible
+            property Fact _showLogReplayStatusBar: _flyViewSettings.showLogReplayStatusBar
         }
-
         FactCheckBoxSlider {
-            Layout.fillWidth: true
-            text:       fact.shortDescription
-            fact:       _appSettings.androidDontSaveToSDCard
-            visible:    fact.visible
+            Layout.fillWidth:   true
+            text:               qsTr("Show simple camera controls (DIGICAM_CONTROL)")
+            visible:            _showDumbCameraControl.visible
+            fact:               _showDumbCameraControl
+
+            property Fact _showDumbCameraControl: _flyViewSettings.showSimpleCameraControl
         }
 
-        QGCCheckBoxSlider {
-            Layout.fillWidth: true
-            text:       qsTr("Clear all settings on next start")
-            checked:    false
-            onClicked: {
-                if (checked) {
-                    QGroundControl.deleteAllSettingsNextBoot()
-                } else {
-                    QGroundControl.clearDeleteAllSettingsNextBoot()
-                }
-            }
-        }
+        // FactCheckBoxSlider {
+        //     Layout.fillWidth: true
+        //     text:       fact.shortDescription
+        //     fact:       _appSettings.androidDontSaveToSDCard
+        //     visible:    fact.visible
+        // }
+
+        // QGCCheckBoxSlider {
+        //     Layout.fillWidth: true
+        //     text:       qsTr("Clear all settings on next start")
+        //     checked:    false
+        //     onClicked: {
+        //         if (checked) {
+        //             QGroundControl.deleteAllSettingsNextBoot()
+        //         } else {
+        //             QGroundControl.clearDeleteAllSettingsNextBoot()
+        //         }
+        //     }
+        // }
 
         RowLayout {
             Layout.fillWidth:   true
@@ -126,138 +145,135 @@ SettingsPage {
             }
         }
 
-        RowLayout {
-            Layout.fillWidth:   true
-            spacing:            ScreenTools.defaultFontPixelWidth * 2
-            visible:            _appSavePath.visible && !ScreenTools.isMobile
+        // RowLayout {
+        //     Layout.fillWidth:   true
+        //     spacing:            ScreenTools.defaultFontPixelWidth * 2
+        //     visible:            _appSavePath.visible && !ScreenTools.isMobile
 
-            ColumnLayout {
-                Layout.fillWidth:   true
-                spacing:            0
+        //     ColumnLayout {
+        //         Layout.fillWidth:   true
+        //         spacing:            0
 
-                QGCLabel { text: qsTr("Application Load/Save Path") }
-                QGCLabel {
-                    Layout.fillWidth:   true
-                    font.pointSize:     ScreenTools.smallFontPointSize
-                    text:               _appSavePath.rawValue === "" ? qsTr("<default location>") : _appSavePath.value
-                    elide:              Text.ElideMiddle
-                }
-            }
+        //         QGCLabel { text: qsTr("Application Load/Save Path") }
+        //         QGCLabel {
+        //             Layout.fillWidth:   true
+        //             font.pointSize:     ScreenTools.smallFontPointSize
+        //             text:               _appSavePath.rawValue === "" ? qsTr("<default location>") : _appSavePath.value
+        //             elide:              Text.ElideMiddle
+        //         }
+        //     }
 
-            QGCButton {
-                text:       qsTr("Browse")
-                onClicked:  savePathBrowseDialog.openForLoad()
-                QGCFileDialog {
-                    id:                 savePathBrowseDialog
-                    title:              qsTr("Choose the location to save/load files")
-                    folder:             _appSavePath.rawValue
-                    selectFolder:       true
-                    onAcceptedForLoad:  (file) => _appSavePath.rawValue = file
-                }
-            }
-        }
-    }
-
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("Units")
-        visible:            QGroundControl.settingsManager.unitsSettings.visible
-
-        Repeater {
-            model: [ QGroundControl.settingsManager.unitsSettings.horizontalDistanceUnits, QGroundControl.settingsManager.unitsSettings.verticalDistanceUnits, QGroundControl.settingsManager.unitsSettings.areaUnits, QGroundControl.settingsManager.unitsSettings.speedUnits, QGroundControl.settingsManager.unitsSettings.temperatureUnits ]
-
-            LabelledFactComboBox {
-                label:                  modelData.shortDescription
-                fact:                   modelData
-                indexModel:             false
-            }
-        }
-    }
-
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("Brand Image")
-        visible:            _brandImageSettings.visible && !ScreenTools.isMobile
-
-        RowLayout {
-            Layout.fillWidth:   true
-            spacing:            ScreenTools.defaultFontPixelWidth * 2
-            visible:            _userBrandImageIndoor.visible
-
-            ColumnLayout {
-                Layout.fillWidth:   true
-                spacing:            0
-
-                QGCLabel {
-                    Layout.fillWidth:   true
-                    text:               qsTr("Indoor Image")
-                }
-                QGCLabel {
-                    Layout.fillWidth:   true
-                    font.pointSize:     ScreenTools.smallFontPointSize
-                    text:               _userBrandImageIndoor.valueString.replace("file:///", "")
-                    elide:              Text.ElideMiddle
-                    visible:            _userBrandImageIndoor.valueString.length > 0
-                }
-            }
 
             QGCButton {
-                text:       qsTr("Browse")
-                onClicked:  userBrandImageIndoorBrowseDialog.openForLoad()
-
-                QGCFileDialog {
-                    id:                 userBrandImageIndoorBrowseDialog
-                    title:              qsTr("Choose custom brand image file")
-                    folder:             _userBrandImageIndoor.rawValue.replace("file:///", "")
-                    selectFolder:       false
-                    onAcceptedForLoad:  (file) => _userBrandImageIndoor.rawValue = "file:///" + file
-                }
+                text:       qsTr("Reboot Vehicle")
+                onClicked:  mainWindow.showMessageDialog(qsTr("Reboot Vehicle"),
+                                                         qsTr("Select Ok to reboot vehicle."),
+                                                         Dialog.Cancel | Dialog.Ok,
+                                                         function() { _activeVehicle.rebootVehicle() })
             }
-        }
-
-        RowLayout {
-            Layout.fillWidth:   true
-            spacing:            ScreenTools.defaultFontPixelWidth * 2
-            visible:            _userBrandImageOutdoor.visible
-
-            ColumnLayout {
-                Layout.fillWidth:   true
-                spacing:            0
-
-                QGCLabel {
-                    Layout.fillWidth:   true
-                    text:               qsTr("Outdoor Image")
-                }
-                QGCLabel {
-                    Layout.fillWidth:   true
-                    font.pointSize:     ScreenTools.smallFontPointSize
-                    text:               _userBrandImageOutdoor.valueString.replace("file:///", "")
-                    elide:              Text.ElideMiddle
-                    visible:            _userBrandImageOutdoor.valueString.length > 0
-                }
-            }
-
-            QGCButton {
-                text:       qsTr("Browse")
-                onClicked:  userBrandImageOutdoorBrowseDialog.openForLoad()
-
-                QGCFileDialog {
-                    id:                 userBrandImageOutdoorBrowseDialog
-                    title:              qsTr("Choose custom brand image file")
-                    folder:             _userBrandImageOutdoor.rawValue.replace("file:///", "")
-                    selectFolder:       false
-                    onAcceptedForLoad:  (file) => _userBrandImageOutdoor.rawValue = "file:///" + file
-                }
-            }
-        }
-
-        LabelledButton {
-            label:      qsTr("Reset Images")
-            buttonText: qsTr("Reset")
-            onClicked:  {
-                _userBrandImageIndoor.rawValue = ""
-                _userBrandImageOutdoor.rawValue = ""
-            }
-        }
+        // }
     }
+
+    // SettingsGroupLayout {
+    //     Layout.fillWidth:   true
+    //     heading:            qsTr("Units")
+    //     visible:            QGroundControl.settingsManager.unitsSettings.visible
+
+    //     Repeater {
+    //         model: [ QGroundControl.settingsManager.unitsSettings.horizontalDistanceUnits, QGroundControl.settingsManager.unitsSettings.verticalDistanceUnits, QGroundControl.settingsManager.unitsSettings.areaUnits, QGroundControl.settingsManager.unitsSettings.speedUnits, QGroundControl.settingsManager.unitsSettings.temperatureUnits ]
+
+    //         LabelledFactComboBox {
+    //             label:                  modelData.shortDescription
+    //             fact:                   modelData
+    //             indexModel:             false
+    //         }
+    //     }
+    // }
+
+    // SettingsGroupLayout {
+    //     Layout.fillWidth:   true
+    //     heading:            qsTr("Brand Image")
+    //     visible:            _brandImageSettings.visible && !ScreenTools.isMobile
+
+    //     RowLayout {
+    //         Layout.fillWidth:   true
+    //         spacing:            ScreenTools.defaultFontPixelWidth * 2
+    //         visible:            _userBrandImageIndoor.visible
+
+    //         ColumnLayout {
+    //             Layout.fillWidth:   true
+    //             spacing:            0
+
+    //             QGCLabel {
+    //                 Layout.fillWidth:   true
+    //                 text:               qsTr("Indoor Image")
+    //             }
+    //             QGCLabel {
+    //                 Layout.fillWidth:   true
+    //                 font.pointSize:     ScreenTools.smallFontPointSize
+    //                 text:               _userBrandImageIndoor.valueString.replace("file:///", "")
+    //                 elide:              Text.ElideMiddle
+    //                 visible:            _userBrandImageIndoor.valueString.length > 0
+    //             }
+    //         }
+
+    //         QGCButton {
+    //             text:       qsTr("Browse")
+    //             onClicked:  userBrandImageIndoorBrowseDialog.openForLoad()
+
+    //             QGCFileDialog {
+    //                 id:                 userBrandImageIndoorBrowseDialog
+    //                 title:              qsTr("Choose custom brand image file")
+    //                 folder:             _userBrandImageIndoor.rawValue.replace("file:///", "")
+    //                 selectFolder:       false
+    //                 onAcceptedForLoad:  (file) => _userBrandImageIndoor.rawValue = "file:///" + file
+    //             }
+    //         }
+    //     }
+
+    //     RowLayout {
+    //         Layout.fillWidth:   true
+    //         spacing:            ScreenTools.defaultFontPixelWidth * 2
+    //         visible:            _userBrandImageOutdoor.visible
+
+    //         ColumnLayout {
+    //             Layout.fillWidth:   true
+    //             spacing:            0
+
+    //             QGCLabel {
+    //                 Layout.fillWidth:   true
+    //                 text:               qsTr("Outdoor Image")
+    //             }
+    //             QGCLabel {
+    //                 Layout.fillWidth:   true
+    //                 font.pointSize:     ScreenTools.smallFontPointSize
+    //                 text:               _userBrandImageOutdoor.valueString.replace("file:///", "")
+    //                 elide:              Text.ElideMiddle
+    //                 visible:            _userBrandImageOutdoor.valueString.length > 0
+    //             }
+    //         }
+
+    //         QGCButton {
+    //             text:       qsTr("Browse")
+    //             onClicked:  userBrandImageOutdoorBrowseDialog.openForLoad()
+
+    //             QGCFileDialog {
+    //                 id:                 userBrandImageOutdoorBrowseDialog
+    //                 title:              qsTr("Choose custom brand image file")
+    //                 folder:             _userBrandImageOutdoor.rawValue.replace("file:///", "")
+    //                 selectFolder:       false
+    //                 onAcceptedForLoad:  (file) => _userBrandImageOutdoor.rawValue = "file:///" + file
+    //             }
+    //         }
+    //     }
+
+    //     LabelledButton {
+    //         label:      qsTr("Reset Images")
+    //         buttonText: qsTr("Reset")
+    //         onClicked:  {
+    //             _userBrandImageIndoor.rawValue = ""
+    //             _userBrandImageOutdoor.rawValue = ""
+    //         }
+    //     }
+    // }
 }

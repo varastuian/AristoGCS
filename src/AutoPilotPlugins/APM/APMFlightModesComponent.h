@@ -27,6 +27,7 @@ public:
     bool setupComplete() const final { return true; }
     QUrl setupSource() const final { return QUrl::fromUserInput(QStringLiteral("qrc:/qml/QGroundControl/AutoPilotPlugins/APM/APMFlightModesComponent.qml")); }
     QUrl summaryQmlSource() const final { return QUrl::fromUserInput(QStringLiteral("qrc:/qml/QGroundControl/AutoPilotPlugins/APM/APMFlightModesComponentSummary.qml")); }
+    bool requiresPassword()  const final { return true; }
 
 private:
     const QString _name = tr("Flight Modes");

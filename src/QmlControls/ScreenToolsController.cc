@@ -84,6 +84,7 @@ QString ScreenToolsController::normalFontFamily()
     }
 
     return QStringLiteral("Open Sans");
+    // return QStringLiteral("Siegra");
 }
 
 double ScreenToolsController::defaultFontDescent(int pointSize)

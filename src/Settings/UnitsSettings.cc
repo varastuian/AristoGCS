@@ -28,15 +28,15 @@ DECLARE_SETTINGSFACT_NO_FUNC(UnitsSettings, horizontalDistanceUnits)
         metaData->setEnumInfo(enumStrings, enumValues);
 
         HorizontalDistanceUnits defaultHorizontalDistanceUnit = HorizontalDistanceUnitsMeters;
-        switch(QLocale::system().measurementSystem()) {
-            case QLocale::MetricSystem: {
-                defaultHorizontalDistanceUnit = HorizontalDistanceUnitsMeters;
-            } break;
-            case QLocale::ImperialUSSystem:
-            case QLocale::ImperialUKSystem:
-                defaultHorizontalDistanceUnit = HorizontalDistanceUnitsFeet;
-                break;
-        }
+        // switch(QLocale::system().measurementSystem()) {
+        //     case QLocale::MetricSystem: {
+        //         defaultHorizontalDistanceUnit = HorizontalDistanceUnitsMeters;
+        //     } break;
+        //     case QLocale::ImperialUSSystem:
+        //     case QLocale::ImperialUKSystem:
+        //         defaultHorizontalDistanceUnit = HorizontalDistanceUnitsFeet;
+        //         break;
+        // }
         metaData->setRawDefaultValue(defaultHorizontalDistanceUnit);
         metaData->setQGCRebootRequired(true);
         _horizontalDistanceUnitsFact = new SettingsFact(_settingsGroup, metaData, this);
@@ -58,15 +58,15 @@ DECLARE_SETTINGSFACT_NO_FUNC(UnitsSettings, verticalDistanceUnits)
         metaData->setShortDescription(UnitsSettings::tr("Vertical Distance"));
         metaData->setEnumInfo(enumStrings, enumValues);
         VerticalDistanceUnits defaultVerticalAltitudeUnit = VerticalDistanceUnitsMeters;
-        switch(QLocale::system().measurementSystem()) {
-            case QLocale::MetricSystem: {
-                defaultVerticalAltitudeUnit = VerticalDistanceUnitsMeters;
-            } break;
-            case QLocale::ImperialUSSystem:
-            case QLocale::ImperialUKSystem:
-                defaultVerticalAltitudeUnit = VerticalDistanceUnitsFeet;
-                break;
-        }
+        // switch(QLocale::system().measurementSystem()) {
+        //     case QLocale::MetricSystem: {
+        //         defaultVerticalAltitudeUnit = VerticalDistanceUnitsMeters;
+        //     } break;
+        //     case QLocale::ImperialUSSystem:
+        //     case QLocale::ImperialUKSystem:
+        //         defaultVerticalAltitudeUnit = VerticalDistanceUnitsFeet;
+        //         break;
+        // }
         metaData->setRawDefaultValue(defaultVerticalAltitudeUnit);
         metaData->setQGCRebootRequired(true);
         _verticalDistanceUnitsFact = new SettingsFact(_settingsGroup, metaData, this);
@@ -93,16 +93,16 @@ DECLARE_SETTINGSFACT_NO_FUNC(UnitsSettings, areaUnits)
         metaData->setShortDescription(UnitsSettings::tr("Area"));
         metaData->setEnumInfo(enumStrings, enumValues);
 
-        AreaUnits defaultAreaUnit = AreaUnitsSquareMeters;
-        switch(QLocale::system().measurementSystem()) {
-            case QLocale::MetricSystem: {
-                defaultAreaUnit = AreaUnitsSquareMeters;
-            } break;
-            case QLocale::ImperialUSSystem:
-            case QLocale::ImperialUKSystem:
-                defaultAreaUnit = AreaUnitsSquareMiles;
-                break;
-        }
+        AreaUnits defaultAreaUnit = AreaUnitsHectares;
+        // switch(QLocale::system().measurementSystem()) {
+        //     case QLocale::MetricSystem: {
+        //         defaultAreaUnit = AreaUnitsSquareMeters;
+        //     } break;
+        //     case QLocale::ImperialUSSystem:
+        //     case QLocale::ImperialUKSystem:
+        //         defaultAreaUnit = AreaUnitsSquareMiles;
+        //         break;
+        // }
         metaData->setRawDefaultValue(defaultAreaUnit);
         metaData->setQGCRebootRequired(true);
         _areaUnitsFact = new SettingsFact(_settingsGroup, metaData, this);
@@ -128,16 +128,16 @@ DECLARE_SETTINGSFACT_NO_FUNC(UnitsSettings, speedUnits)
         metaData->setShortDescription(UnitsSettings::tr("Speed"));
         metaData->setEnumInfo(enumStrings, enumValues);
 
-        SpeedUnits defaultSpeedUnit = SpeedUnitsMetersPerSecond;
-        switch(QLocale::system().measurementSystem()) {
-            case QLocale::MetricSystem: {
-                defaultSpeedUnit = SpeedUnitsMetersPerSecond;
-            } break;
-            case QLocale::ImperialUSSystem:
-            case QLocale::ImperialUKSystem:
-                defaultSpeedUnit = SpeedUnitsMilesPerHour;
-                break;
-        }
+        SpeedUnits defaultSpeedUnit = SpeedUnitsKilometersPerHour;
+        // switch(QLocale::system().measurementSystem()) {
+        //     case QLocale::MetricSystem: {
+        //         defaultSpeedUnit = SpeedUnitsMetersPerSecond;
+        //     } break;
+        //     case QLocale::ImperialUSSystem:
+        //     case QLocale::ImperialUKSystem:
+        //         defaultSpeedUnit = SpeedUnitsMilesPerHour;
+        //         break;
+        // }
         metaData->setRawDefaultValue(defaultSpeedUnit);
         metaData->setQGCRebootRequired(true);
         _speedUnitsFact = new SettingsFact(_settingsGroup, metaData, this);

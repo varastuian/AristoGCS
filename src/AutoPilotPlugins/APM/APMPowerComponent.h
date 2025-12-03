@@ -28,6 +28,7 @@ public:
     QUrl setupSource() const final { return QUrl::fromUserInput(QStringLiteral("qrc:/qml/QGroundControl/AutoPilotPlugins/APM/APMPowerComponent.qml")); }
     QUrl summaryQmlSource() const final { return QUrl::fromUserInput(QStringLiteral("qrc:/qml/QGroundControl/AutoPilotPlugins/APM/APMPowerComponentSummary.qml")); }
     bool allowSetupWhileArmed() const final { return true; }
+    bool requiresPassword()  const final { return true; }
 
 private:
     const QString _name = tr("Power");

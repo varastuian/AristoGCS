@@ -60,7 +60,7 @@ const QVariantList &APMAutoPilotPlugin::vehicleComponents()
         if (_vehicle->parameterManager()->parametersReady()) {
             _airframeComponent = new APMAirframeComponent(_vehicle, this);
             _airframeComponent->setupTriggerSignals();
-            _components.append(QVariant::fromValue(qobject_cast<VehicleComponent*>(_airframeComponent)));
+            // _components.append(QVariant::fromValue(qobject_cast<VehicleComponent*>(_airframeComponent)));
 
             if (_vehicle->supportsRadio()) {
                 _radioComponent = new APMRadioComponent(_vehicle, this);
@@ -98,24 +98,24 @@ const QVariantList &APMAutoPilotPlugin::vehicleComponents()
                     _vehicle->parameterManager()->parameterExists(-1, QStringLiteral("FOLL_ENABLE"))) {
                 _followComponent = new APMFollowComponent(_vehicle, this);
                 _followComponent->setupTriggerSignals();
-                _components.append(QVariant::fromValue(qobject_cast<VehicleComponent*>(_followComponent)));
+                // _components.append(QVariant::fromValue(qobject_cast<VehicleComponent*>(_followComponent)));
             }
 #endif
 
             if (_vehicle->vehicleType() == MAV_TYPE_HELICOPTER && (_vehicle->versionCompare(4, 0, 0) >= 0)) {
                 _heliComponent = new APMHeliComponent(_vehicle, this);
                 _heliComponent->setupTriggerSignals();
-                _components.append(QVariant::fromValue(qobject_cast<VehicleComponent*>(_heliComponent)));
+                // _components.append(QVariant::fromValue(qobject_cast<VehicleComponent*>(_heliComponent)));
             }
 
             _tuningComponent = new APMTuningComponent(_vehicle, this);
             _tuningComponent->setupTriggerSignals();
-            _components.append(QVariant::fromValue(qobject_cast<VehicleComponent*>(_tuningComponent)));
+            // _components.append(QVariant::fromValue(qobject_cast<VehicleComponent*>(_tuningComponent)));
 
             if (_vehicle->parameterManager()->parameterExists(-1, "MNT1_TYPE")) {
                 _cameraComponent = new APMCameraComponent(_vehicle, this);
                 _cameraComponent->setupTriggerSignals();
-                _components.append(QVariant::fromValue(qobject_cast<VehicleComponent*>(_cameraComponent)));
+                // _components.append(QVariant::fromValue(qobject_cast<VehicleComponent*>(_cameraComponent)));
             }
 
             if (_vehicle->sub()) {
@@ -134,12 +134,12 @@ const QVariantList &APMAutoPilotPlugin::vehicleComponents()
             if (_vehicle->parameterManager()->parameterExists(MAV_COMP_ID_UDP_BRIDGE, "SW_VER")) {
                 _esp8266Component = new ESP8266Component(_vehicle, this);
                 _esp8266Component->setupTriggerSignals();
-                _components.append(QVariant::fromValue(qobject_cast<VehicleComponent*>(_esp8266Component)));
+                // _components.append(QVariant::fromValue(qobject_cast<VehicleComponent*>(_esp8266Component)));
             }
 
             _apmRemoteSupportComponent = new APMRemoteSupportComponent(_vehicle, this);
             _apmRemoteSupportComponent->setupTriggerSignals();
-            _components.append(QVariant::fromValue(qobject_cast<VehicleComponent*>(_apmRemoteSupportComponent)));
+            // _components.append(QVariant::fromValue(qobject_cast<VehicleComponent*>(_apmRemoteSupportComponent)));
         } else {
             qCWarning(APMAutoPilotPluginLog) << "Call to vehicleComponents prior to parametersReady";
         }

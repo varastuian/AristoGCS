@@ -118,7 +118,7 @@ void QGCCorePlugin::adjustSettingMetaData(const QString &settingsGroup, FactMeta
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
             outdoorPalette = 0;
 #else
-            outdoorPalette = 1;
+            outdoorPalette = 0;
 #endif
             metaData.setRawDefaultValue(outdoorPalette);
             return;

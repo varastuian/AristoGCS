@@ -72,6 +72,15 @@ LinkManager::LinkManager(QObject *parent)
 #ifndef QGC_NO_SERIAL_LINK
     (void) qRegisterMetaType<QGCSerialPortInfo>("QGCSerialPortInfo");
 #endif
+
+
+    auto link = new TCPConfiguration("arsha");
+    link->setPort(576);
+    link->setHost("172.17.113.148");
+    if(link) {
+        link->setAutoConnect(true);
+        addConfiguration(link);
+    }
 }
 
 LinkManager::~LinkManager()
@@ -725,6 +734,14 @@ bool LinkManager::containsLink(const LinkInterface *link)
 
 SharedLinkConfigurationPtr LinkManager::addConfiguration(LinkConfiguration *config)
 {
+    SharedLinkConfigurationPtr conf;
+
+
+    for(int i = 0; i < _rgLinkConfigs.count(); i++) {
+        if (_rgLinkConfigs[i].get()->name() == config->name()) {
+            return _rgLinkConfigs.last();
+        }
+    }
     (void) _qmlConfigurations->append(config);
     (void) _rgLinkConfigs.append(SharedLinkConfigurationPtr(config));
 

@@ -41,6 +41,7 @@ class VehicleComponent : public QObject
     Q_PROPERTY(bool     allowSetupWhileArmed                                READ allowSetupWhileArmed   CONSTANT)
     Q_PROPERTY(bool     allowSetupWhileFlying                               READ allowSetupWhileFlying  CONSTANT)
     Q_PROPERTY(AutoPilotPlugin::KnownVehicleComponent KnownVehicleComponent READ KnownVehicleComponent  CONSTANT)
+    Q_PROPERTY(bool     requiresPassword                                    READ requiresPassword       CONSTANT)
 
 public:
     explicit VehicleComponent(Vehicle *vehicle, AutoPilotPlugin *autopilot, AutoPilotPlugin::KnownVehicleComponent KnownVehicleComponent, QObject *parent = nullptr);
@@ -59,6 +60,7 @@ public:
 
     // @return true: Setup panel can be shown while vehicle is flying (and armed)
     virtual bool allowSetupWhileFlying() const { return false; }
+    virtual bool requiresPassword()      const { return false; }
 
     virtual void addSummaryQmlComponent(QQmlContext* context, QQuickItem* parent);
 

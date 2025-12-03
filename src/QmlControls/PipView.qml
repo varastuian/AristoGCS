@@ -140,7 +140,7 @@ Item {
         onPositionChanged: (mouse) => {
             if (pipResize.pressed) {
                 var parentWidth = _root.parent.width
-                var newWidth = pipResize.initialWidth + mouse.x - pipResize.initialX
+                var newWidth = pipResize.initialWidth - mouse.x + pipResize.initialX
                 if (newWidth < parentWidth * _maxSize && newWidth > parentWidth * _minSize) {
                     _pipSize = newWidth
                 }
@@ -154,12 +154,18 @@ Item {
         source:         "/qmlimages/pipResize.svg"
         fillMode:       Image.PreserveAspectFit
         mipmap:         true
-        anchors.right:  parent.right
+        anchors.left:  parent.left
         anchors.top:    parent.top
         visible:        _isExpanded && (ScreenTools.isMobile || pipMouseArea.containsMouse)
         height:         ScreenTools.defaultFontPixelHeight * 2.5
         width:          ScreenTools.defaultFontPixelHeight * 2.5
         sourceSize.height:  height
+        transform: Scale {
+                origin.x: pipResizeIcon.width / 2
+                origin.y: pipResizeIcon.height / 2
+                xScale: -1
+                yScale: 1
+            }
     }
 
     // Check min/max constraints on pip size when when parent is resized
@@ -188,7 +194,8 @@ Item {
         fillMode:       Image.PreserveAspectFit
         anchors.left:   parent.left
         anchors.top:    parent.top
-        visible:        _isExpanded && !ScreenTools.isMobile && pipMouseArea.containsMouse
+        // visible:        _isExpanded && !ScreenTools.isMobile && pipMouseArea.containsMouse
+        visible:        false
         height:         ScreenTools.defaultFontPixelHeight * 2.5
         width:          ScreenTools.defaultFontPixelHeight * 2.5
         sourceSize.height:  height
@@ -206,7 +213,8 @@ Item {
         fillMode:       Image.PreserveAspectFit
         anchors.left:   parent.left
         anchors.bottom: parent.bottom
-        visible:        _isExpanded && (ScreenTools.isMobile || pipMouseArea.containsMouse)
+        // visible:        _isExpanded && (ScreenTools.isMobile || pipMouseArea.containsMouse)
+        visible:        false
         height:         ScreenTools.defaultFontPixelHeight * 2.5
         width:          ScreenTools.defaultFontPixelHeight * 2.5
         sourceSize.height:  height
@@ -218,7 +226,7 @@ Item {
 
     Rectangle {
         id:                     showPip
-        anchors.left :          parent.left
+        anchors.left:           parent.left
         anchors.bottom:         parent.bottom
         height:                 ScreenTools.defaultFontPixelHeight * 2
         width:                  ScreenTools.defaultFontPixelHeight * 2

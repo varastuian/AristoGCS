@@ -46,13 +46,23 @@ Item {
             mipmap:                 true
             color:                  qgcPal.windowTransparentText
             source:                 "/qmlimages/FlightModesComponentIcon.png"
+            visible: false //
         }
 
         QGCLabel {
             id:                 flightModeLabel
-            text:               activeVehicle ? activeVehicle.flightMode : qsTr("N/A", "No data to display")
+            text:               activeVehicle ? mappedFlightMode(_activeVehicle.flightMode)
+                                                 : qsTr("N/A", "No data to display")
             color:              qgcPal.windowTransparentText
             font.pointSize:     fontPointSize
+            textFont : "Siegra"
+            function mappedFlightMode(mode) {
+                    if (mode.includes("ALT_HOLD"))    return "Alt Mode"
+                    if (mode.includes("LOITER"))           return "Pos Mode"
+                    if (mode.includes("RTL"))              return "RTH"
+                    if (mode.includes("AUTO"))             return "Waypoint"
+                    return mode
+                }
 
         }
 
@@ -67,10 +77,10 @@ Item {
         }
     }
 
-    MouseArea {
-        anchors.fill:   mainLayout
-        onClicked:      mainWindow.showIndicatorDrawer(drawerComponent, control)
-    }
+    // MouseArea {
+    //     anchors.fill:   mainLayout
+    //     onClicked:      mainWindow.showIndicatorDrawer(drawerComponent, control)
+    // }
 
     Component {
         id: drawerComponent

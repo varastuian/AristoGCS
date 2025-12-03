@@ -55,48 +55,62 @@ Item {
         leftEdgeBottomInset:    virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.leftEdgeBottomInset : parentToolInsets.leftEdgeBottomInset
         rightEdgeTopInset:      topRightPanel.rightEdgeTopInset
         rightEdgeCenterInset:   topRightPanel.rightEdgeCenterInset
-        rightEdgeBottomInset:   bottomRightRowLayout.rightEdgeBottomInset
+        rightEdgeBottomInset:   instrumentLayout.leftEdgeBottomInset//
         topEdgeLeftInset:       toolStrip.topEdgeLeftInset
         topEdgeCenterInset:     mapScale.topEdgeCenterInset
         topEdgeRightInset:      topRightPanel.topEdgeRightInset
-        bottomEdgeLeftInset:    virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeLeftInset : parentToolInsets.bottomEdgeLeftInset
-        bottomEdgeCenterInset:  bottomRightRowLayout.bottomEdgeCenterInset
-        bottomEdgeRightInset:   virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeRightInset : bottomRightRowLayout.bottomEdgeRightInset
+        bottomEdgeRightInset:   virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeLeftInset : parentToolInsets.bottomEdgeLeftInset
+        bottomEdgeCenterInset:  instrumentLayout.bottomEdgeCenterInset//
+        bottomEdgeLeftInset:    virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeRightInset : instrumentLayout.bottomEdgeLeftInset
     }
 
     FlyViewTopRightPanel {
         id:                     topRightPanel
         anchors.top:            parent.top
         anchors.right:          parent.right
-        maximumHeight:          parent.height - (bottomRightRowLayout.height + _margins * 4)
-
+        maximumHeight:          parent.height - (instrumentLayout.height + _margins * 4)
+        visible:false
         property real topEdgeRightInset:    height + _layoutMargin
         property real rightEdgeTopInset:    width + _layoutMargin
         property real rightEdgeCenterInset: rightEdgeTopInset
     }
-
+    //photo and terrain
     FlyViewTopRightColumnLayout {
         id:                 topRightColumnLayout
         anchors.top:        parent.top
-        anchors.bottom:     bottomRightRowLayout.top
+        anchors.bottom:     instrumentLayout.top
         anchors.right:      parent.right
         spacing:            _layoutSpacing
-        visible:           !topRightPanel.visible
+        // visible:           !topRightPanel.visible
 
         property real topEdgeRightInset:    childrenRect.height + _layoutMargin
         property real rightEdgeTopInset:    width + _layoutMargin
         property real rightEdgeCenterInset: rightEdgeTopInset
     }
 
-    FlyViewBottomRightRowLayout {
-        id:                 bottomRightRowLayout
-        anchors.bottom:     parent.bottom
-        anchors.right:      parent.right
+    RowLayout {
+        id:                     instrumentLayout
+        anchors.bottom:         parent.bottom
+        anchors.left:           parent.left
         spacing:            _layoutSpacing
 
-        property real bottomEdgeRightInset:     height + _layoutMargin
-        property real bottomEdgeCenterInset:    bottomEdgeRightInset
-        property real rightEdgeBottomInset:     width + _layoutMargin
+        property real bottomEdgeLeftInset:     height + _layoutMargin
+        property real bottomEdgeCenterInset:    bottomEdgeLeftInset
+        property real leftEdgeBottomInset:     width + _layoutMargin
+
+
+        FlyViewInstrumentPanel {
+            id:                 instrumentPanel
+            Layout.alignment:   Qt.AlignBottom
+        }
+
+        TelemetryValuesBar {
+            Layout.alignment:       Qt.AlignVCenter
+            extraWidth:             instrumentPanel.extraValuesWidth
+            settingsGroup:          factValueGrid.telemetryBarSettingsGroup
+            specificVehicleForCard: null // Tracks active vehicle
+        }
+
     }
 
     FlyViewMissionCompleteDialog {
@@ -135,7 +149,7 @@ Item {
         property bool _virtualJoystickEnabled: QGroundControl.settingsManager.appSettings.virtualJoystick.rawValue
         property real bottomEdgeRightInset:    parent.height-y
         property var  _pipViewMargin:          _pipView.visible ? parentToolInsets.bottomEdgeLeftInset + ScreenTools.defaultFontPixelHeight * 2 :
-                                               bottomRightRowLayout.height + ScreenTools.defaultFontPixelHeight * 1.5
+                                               intrumentLayout.height + ScreenTools.defaultFontPixelHeight * 1.5
 
         property var  bottomLoaderMargin:      _pipViewMargin >= parent.height / 2 ? parent.height / 2 : _pipViewMargin
 
@@ -160,25 +174,73 @@ Item {
         }
     }
 
-    FlyViewToolStrip {
+
+    ToolStrip{
         id:                     toolStrip
         anchors.left:           parent.left
         anchors.top:            parent.top
         z:                      QGroundControl.zOrderWidgets
-        maxHeight:              parent.height - y - parentToolInsets.bottomEdgeLeftInset - _toolsMargin
+        // maxHeight:              parent.height - y - parentToolInsets.bottomEdgeLeftInset - _toolsMargin
+        maxHeight : 900
         visible:                !QGroundControl.videoManager.fullScreen
 
-        onDisplayPreFlightChecklist: {
-            if (!preFlightChecklistLoader.active) {
-                preFlightChecklistLoader.active = true
-            }
-            preFlightChecklistLoader.item.open()
-        }
 
         property real topEdgeLeftInset:     visible ? y + height : 0
         property real leftEdgeTopInset:     visible ? x + width : 0
         property real leftEdgeCenterInset:  leftEdgeTopInset
+
+
+        ToolStripActionList {
+            id: modeModel
+            model: [
+                ToolStripAction {
+                    iconSource:                 "/res/ALTHOLD"
+                    text:                       qsTr("Alt Mode")
+                    onTriggered:{
+                        _activeVehicle.flightMode = "ALT_HOLD"
+                    }
+                },
+                ToolStripAction {
+                    iconSource:                 "/res/POSHOLD"
+                    text:                       "Pos Mode"
+                    onTriggered:{
+                        _activeVehicle.flightMode = "Loiter"
+                    }
+                },
+                ToolStripAction {
+                    iconSource:                 "/res/rtl.svg"
+                    text:                       "RTH"
+                    onTriggered:{
+                        _activeVehicle.flightMode = "RTL"
+                    }
+                },
+                ToolStripAction {
+                    iconSource:                 "/res/waypoint.svg"
+                    text:                        "Waypoint"
+                    // onPressAndHold:{
+                    //      mainWindow.showPlanView()
+
+                    // }
+                    onTriggered:{
+                        _activeVehicle.flightMode = "Auto"
+                    }
+                },
+                ToolStripAction {
+                    iconSource:                 "/res/land.svg"
+                    text:                       "Land"
+                    onTriggered:{
+                        _guidedController.confirmAction(2)
+                    }
+                }
+                // GuidedActionTakeoff { },
+                // GuidedActionLand { },
+                // GuidedActionRTL { }
+
+            ]
+        }
+        model:modeModel.model
     }
+
 
     VehicleWarnings {
         anchors.centerIn:   parent

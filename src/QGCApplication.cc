@@ -227,6 +227,10 @@ void QGCApplication::init()
     if (QFontDatabase::addApplicationFont(":/fonts/opensans-demibold") < 0) {
         qCWarning(QGCApplicationLog) << "Could not load /fonts/opensans-demibold font";
     }
+    // Arsha
+    if (QFontDatabase::addApplicationFont(":/fonts/Siegra") < 0) {
+        qWarning() << "Could not load /fonts/Siegra font";
+    }
 
     if (_simpleBootTest) {
         // Since GStream builds are so problematic we initialize video during the simple boot test

@@ -83,8 +83,8 @@ Rectangle {
                 font.bold:      true
                 horizontalAlignment: Text.AlignHCenter
                 text:           setupComplete ?
-                    qsTr("Below you will find a summary of the settings for your vehicle. To the left are the setup menus for each component.") :
-                    qsTr("WARNING: Your vehicle requires setup prior to flight. Please resolve the items marked in red using the menu on the left.")
+                    qsTr("Summary of the settings for vehicle") :
+                    qsTr("Danger: Resolve the items marked in red.")
 
                 property bool setupComplete: QGroundControl.multiVehicleManager.activeVehicle ? QGroundControl.multiVehicleManager.activeVehicle.autopilotPlugin.setupComplete : false
             }
@@ -130,12 +130,12 @@ Rectangle {
                                 visible:                modelData.requiresSetup && modelData.setupSource !== ""
                             }
 
-                            onClicked : {
-                                //console.log(modelData.setupSource)
-                                if (modelData.setupSource !== "") {
-                                    setupView.showVehicleComponentPanel(modelData)
-                                }
-                            }
+                            // onClicked : {
+                            //     //console.log(modelData.setupSource)
+                            //     if (modelData.setupSource !== "") {
+                            //         setupView.showVehicleComponentPanel(modelData)
+                            //     }
+                            // }
                         }
                         // Summary Qml
                         Rectangle {

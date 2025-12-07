@@ -189,6 +189,30 @@ Item {
         property real leftEdgeTopInset:     visible ? x + width : 0
         property real leftEdgeCenterInset:  leftEdgeTopInset
 
+        delegate: ToolButton {
+                id: btn
+                action: modelData
+
+                // Add long-press support
+                Timer {
+                    id: longPressTimer
+                    interval: 600
+                    repeat: false
+                    onTriggered: {
+                        if (modelData.text === "Waypoint") {
+                            mainWindow.showPlanView()
+                        }
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onPressed: longPressTimer.start()
+                    onReleased: longPressTimer.stop()   // cancel if button released early
+                    onCanceled: longPressTimer.stop()
+                }
+            }
+
 
         ToolStripActionList {
             id: modeModel
@@ -217,12 +241,16 @@ Item {
                 ToolStripAction {
                     iconSource:                 "/res/waypoint.svg"
                     text:                        "Waypoint"
-                    // onPressAndHold:{
-                    //      mainWindow.showPlanView()
 
-                    // }
                     onTriggered:{
                         _activeVehicle.flightMode = "Auto"
+                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onPressAndHold:{
+                             mainWindow.showPlanView()
+
+                        }
                     }
                 },
                 ToolStripAction {
